@@ -262,11 +262,11 @@ void loop() {
   }
 }
 ```
-### Codigo experimental no funciona
+### Codigo experimental FUNCIONA Y UN POCO OPTIMIZADO PERO LE FALTAN DETALLES
 
 ```c++
 #include "esp_camera.h"
-#include "FS.h"
+//#include "FS.h"
 //#include "SD_MMC.h"
 
 #include <WiFi.h>
@@ -302,57 +302,91 @@ UniversalTelegramBot bot(BOTtoken, clientTCP);
 #define HREF_GPIO_NUM     23
 #define PCLK_GPIO_NUM     22
 
-//Numero de foto
-int fotoNum = 1;
-
 int led = 2;
 
-void TomarFoto()
+String sendPhotoTelegram()
 {
-  camera_fb_t * fb = NULL;
+  const char* myDomain = "api.telegram.org";
+  String getAll = "";
+  String getBody = "";
 
-  //Toma la foto
+  camera_fb_t * fb = NULL;
   fb = esp_camera_fb_get();
-  if (!fb)
-  {
-    Serial.println("La camara no pudo realizar la fotografia");
-    return;
+  if (!fb) {
+    Serial.println("Camera capture failed");
+    delay(1000);
+    ESP.restart();
+    return "Camera capture failed";
   }
 
-  //Ruta de la tarjeta sd donde se guardara la foto
-  String ruta = "/foto" + String(fotoNum) + ".jpg";
+  Serial.println("Connect to " + String(myDomain));
 
-  //fs::FS &fs = SD_MMC;
-  //Serial.println("Foto nombre de archivo: " + ruta);
+  if (clientTCP.connect(myDomain, 443)) 
+  {
+    Serial.println("Connection successful");
 
-  //File archivo = fs.open(ruta, FILE_WRITE);
-  /*
-    if (!archivo)
-    {
-      Serial.println("Fallo en abrir el archivo para escribir");
+    String head = "--RandomNerdTutorials\r\nContent-Disposition: form-data; name=\"chat_id\"; \r\n\r\n" + CHAT_ID + "\r\n--RandomNerdTutorials\r\nContent-Disposition: form-data; name=\"photo\"; filename=\"esp32-cam.jpg\"\r\nContent-Type: image/jpeg\r\n\r\n";
+    String tail = "\r\n--RandomNerdTutorials--\r\n";
+
+    uint16_t imageLen = fb->len;
+    uint16_t extraLen = head.length() + tail.length();
+    uint16_t totalLen = imageLen + extraLen;
+
+    clientTCP.println("POST /bot" + BOTtoken + "/sendPhoto HTTP/1.1");
+    clientTCP.println("Host: " + String(myDomain));
+    clientTCP.println("Content-Length: " + String(totalLen));
+    clientTCP.println("Content-Type: multipart/form-data; boundary=RandomNerdTutorials");
+    clientTCP.println();
+    clientTCP.print(head);
+
+    uint8_t *fbBuf = fb->buf;
+    size_t fbLen = fb->len;
+    for (size_t n = 0; n < fbLen; n = n + 1024) {
+      if (n + 1024 < fbLen) {
+        clientTCP.write(fbBuf, 1024);
+        fbBuf += 1024;
+      }
+      else if (fbLen % 1024 > 0) {
+        size_t remainder = fbLen % 1024;
+        clientTCP.write(fbBuf, remainder);
+      }
     }
 
-    else
-    {
-      //Escribe en la tarjeta sd la foto
-      archivo.write(fb->buf, fb->len);
-      Serial.println("Archivo guardado en la ruta: " + ruta);
+    clientTCP.print(tail);
+
+    esp_camera_fb_return(fb);
+
+    int waitTime = 10000;   // timeout 10 seconds
+    long startTimer = millis();
+    boolean state = false;
+
+    while ((startTimer + waitTime) > millis()) {
+      Serial.print(".");
+      delay(100);
+      while (clientTCP.available()) {
+        char c = clientTCP.read();
+        if (state == true) getBody += String(c);
+        if (c == '\n') {
+          if (getAll.length() == 0) state = true;
+          getAll = "";
+        }
+        else if (c != '\r')
+          getAll += String(c);
+        startTimer = millis();
+      }
+      if (getBody.length() > 0) break;
     }
-  */
-  //Cierra el archivo
-  //archivo.close();
-
-  esp_camera_fb_return(fb);
-
-  //Incrementa el valor
-  fotoNum++;
-
-  //Retardo de 2 segundos
-  delay(2000);
+    clientTCP.stop();
+    Serial.println(getBody);
+  }
+  else {
+    getBody = "Connected to api.telegram.org failed.";
+    Serial.println("Connected to api.telegram.org failed.");
+  }
+  return getBody;
 }
 
-void setup()
-{
+void setup() {
   //Inicia el puerto serial
   Serial.begin(115200);
   pinMode(led, OUTPUT);
@@ -416,11 +450,11 @@ void setup()
     return;
   }
 
-
 }
 
 void loop()
 {
+
   //Obtiene el numero de los mensajes recibidos
   int newMensaje = bot.getUpdates(bot.last_message_received + 1);
 
@@ -448,87 +482,21 @@ void loop()
       }
 
       //Si el usuario envia el comando /on se ejecutara la siguiente accion
-      else if (text == "/foto")
-      {
-        //digitalWrite(led, HIGH);
-        //bot.sendMessage(chat_id, "Led Esta ENCENDIDO", "");
-        Serial.println("Tomar foto");
-
-
-        const char* myDomain = "api.telegram.org";
-
-        if (clientTCP.connect(myDomain, 443))
-        {
-          camera_fb_t * fb = NULL;
-
-          //Toma la foto
-          fb = esp_camera_fb_get();
-          if (!fb)
-          {
-            Serial.println("La camara no pudo realizar la fotografia");
-            return;
-          }
-
-          //Ruta de la tarjeta sd donde se guardara la foto
-          //String ruta = "/foto" + String(fotoNum) + ".jpg";
-
-
-
-          esp_camera_fb_return(fb);
-
-          //Incrementa el valor
-          fotoNum++;
-
-          //Retardo de 2 segundos
-          delay(2000);
-
-          // TomarFoto();
-          Serial.println("Connection successful");
-
-          String head = "--RandomNerdTutorials\r\nContent-Disposition: form-data; name=\"chat_id\"; \r\n\r\n" + CHAT_ID + "\r\n--RandomNerdTutorials\r\nContent-Disposition: form-data; name=\"photo\"; filename=\"esp32-cam.jpg\"\r\nContent-Type: image/jpeg\r\n\r\n";
-          String tail = "\r\n--RandomNerdTutorials--\r\n";
-
-          uint16_t imageLen = fb->len;
-          uint16_t extraLen = head.length() + tail.length();
-          uint16_t totalLen = imageLen + extraLen;
-
-          clientTCP.println("POST /bot" + BOTtoken + "/sendPhoto HTTP/1.1");
-          clientTCP.println("Host: " + String(myDomain));
-          clientTCP.println("Content-Length: " + String(totalLen));
-          clientTCP.println("Content-Type: multipart/form-data; boundary=RandomNerdTutorials");
-          clientTCP.println();
-          clientTCP.print(head);
-
-          uint8_t *fbBuf = fb->buf;
-          size_t fbLen = fb->len;
-          for (size_t n = 0; n < fbLen; n = n + 1024) {
-            if (n + 1024 < fbLen)
-            {
-              clientTCP.write(fbBuf, 1024);
-              fbBuf += 1024;
-            }
-            else if (fbLen % 1024 > 0) {
-              size_t remainder = fbLen % 1024;
-              clientTCP.write(fbBuf, remainder);
-            }
-          }
-        }
-      }
-
-
-      //Si el usuario envia el comando /on se ejecutara la siguiente accion
       else if (text == "/on")
       {
         digitalWrite(led, HIGH);
         bot.sendMessage(chat_id, "Led Esta ENCENDIDO", "");
         Serial.println("Led Encendido");
       }
+
       //Si el usuario envia el comando /off se ejecutara la siguiente accion
-      else if (text == "/off")
+      else if (text == "/photo")
       {
-        digitalWrite(led, LOW);
-        bot.sendMessage(chat_id, "Led esta APAGADO", "");
-        Serial.println("Led Apagado");
+        //digitalWrite(led, LOW);
+        bot.sendMessage(chat_id, "Enviando foto", "");
+        Serial.println("foto");
+        sendPhotoTelegram();
+
       }
 
       //En caso que no exista el comando
@@ -543,8 +511,10 @@ void loop()
     }
 
   }
-  //TomarFoto();
-}
 
+  //Espera un segundo
+  delay(1000);
+
+}
 ```
 
