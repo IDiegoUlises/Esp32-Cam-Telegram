@@ -263,6 +263,8 @@ void loop() {
 }
 ```
 ### Codigo experimental no funciona
+
+```c++
 #include "esp_camera.h"
 #include "FS.h"
 //#include "SD_MMC.h"
@@ -543,4 +545,6 @@ void loop()
   }
   //TomarFoto();
 }
+
+```
 
