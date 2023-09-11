@@ -300,8 +300,10 @@ UniversalTelegramBot bot(BOTtoken, clientTCP);
 #define HREF_GPIO_NUM     23
 #define PCLK_GPIO_NUM     22
 
+//Pin para controlar el Led
+int led = 2;
 
-//Funcion para enviar la fotografia
+//Funcion para enviar la imagen de la camara
 String sendPhotoTelegram()
 {
   const char* myDomain = "api.telegram.org";
@@ -384,7 +386,7 @@ String sendPhotoTelegram()
   return getBody;
 }
 
-void setup() 
+void setup()
 {
   //Inicia el puerto serial
   Serial.begin(115200);
@@ -483,17 +485,24 @@ void loop()
       else if (text == "/on")
       {
         digitalWrite(led, HIGH);
-        bot.sendMessage(chat_id, "Led Esta ENCENDIDO", "");
+        bot.sendMessage(chat_id, "Led Encendido", "");
         Serial.println("Led Encendido");
       }
 
       //Si el usuario envia el comando /off se ejecutara la siguiente accion
+      else if (text == "/off")
+      {
+        digitalWrite(led, LOW);
+        bot.sendMessage(chat_id, "Led Apagado", "");
+        Serial.println("Led Encendido");
+      }
+
+      //Si el usuario envia el comando /photo se enviara una foto desde la camara
       else if (text == "/photo")
       {
-        //digitalWrite(led, LOW);
         bot.sendMessage(chat_id, "Enviando foto", "");
-        Serial.println("foto");
         sendPhotoTelegram();
+        Serial.println("Foto Enviada");
 
       }
 
