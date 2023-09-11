@@ -265,13 +265,10 @@ void loop() {
 ### Codigo experimental FUNCIONA Y UN POCO OPTIMIZADO PERO LE FALTAN DETALLES COMO AGREGAR DOCUMENTACION Y CAMBIAR ENCABEZADOS DE HTTP HEADER ADEMAS VER LA POSIBILIDAD QUE LA FOTO SALGA DE FRENTE 
 
 ```c++
-#include "esp_camera.h"
-//#include "FS.h"
-//#include "SD_MMC.h"
-
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
 #include <UniversalTelegramBot.h>
+#include "esp_camera.h"
 
 // Wifi Credenciales
 #define WIFI_SSID "Wifi Home"
@@ -281,6 +278,7 @@ void loop() {
 String BOTtoken = "6651295482:AAHSOXNTzMyJmrj6nuQi7wskSMFatI8Uyks";
 String CHAT_ID  = "6615998413";
 
+//Objeto WifiSecure y UniversalTelegramBot
 WiFiClientSecure clientTCP;
 UniversalTelegramBot bot(BOTtoken, clientTCP);
 
@@ -302,8 +300,8 @@ UniversalTelegramBot bot(BOTtoken, clientTCP);
 #define HREF_GPIO_NUM     23
 #define PCLK_GPIO_NUM     22
 
-int led = 2;
 
+//Funcion para enviar la fotografia
 String sendPhotoTelegram()
 {
   const char* myDomain = "api.telegram.org";
@@ -321,12 +319,12 @@ String sendPhotoTelegram()
 
   Serial.println("Connect to " + String(myDomain));
 
-  if (clientTCP.connect(myDomain, 443)) 
+  if (clientTCP.connect(myDomain, 443))
   {
     Serial.println("Connection successful");
 
-    String head = "--RandomNerdTutorials\r\nContent-Disposition: form-data; name=\"chat_id\"; \r\n\r\n" + CHAT_ID + "\r\n--RandomNerdTutorials\r\nContent-Disposition: form-data; name=\"photo\"; filename=\"esp32-cam.jpg\"\r\nContent-Type: image/jpeg\r\n\r\n";
-    String tail = "\r\n--RandomNerdTutorials--\r\n";
+    String head = "--TelegramBot\r\nContent-Disposition: form-data; name=\"chat_id\"; \r\n\r\n" + CHAT_ID + "\r\n--TelegramBot\r\nContent-Disposition: form-data; name=\"photo\"; filename=\"esp32-cam.jpg\"\r\nContent-Type: image/jpeg\r\n\r\n";
+    String tail = "\r\n--TelegramBot--\r\n";
 
     uint16_t imageLen = fb->len;
     uint16_t extraLen = head.length() + tail.length();
@@ -335,7 +333,7 @@ String sendPhotoTelegram()
     clientTCP.println("POST /bot" + BOTtoken + "/sendPhoto HTTP/1.1");
     clientTCP.println("Host: " + String(myDomain));
     clientTCP.println("Content-Length: " + String(totalLen));
-    clientTCP.println("Content-Type: multipart/form-data; boundary=RandomNerdTutorials");
+    clientTCP.println("Content-Type: multipart/form-data; boundary=TelegramBot");
     clientTCP.println();
     clientTCP.print(head);
 
@@ -386,10 +384,10 @@ String sendPhotoTelegram()
   return getBody;
 }
 
-void setup() {
+void setup() 
+{
   //Inicia el puerto serial
   Serial.begin(115200);
-  pinMode(led, OUTPUT);
 
   //Se conecta la a red wifi, en caso de no conectarse quedara en un bucle infinito
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
@@ -512,8 +510,8 @@ void loop()
 
   }
 
-  //Espera un segundo
-  delay(1000);
+  //Espera la mitad de un segundo
+  delay(500);
 
 }
 ```
