@@ -280,5 +280,5 @@ void loop()
 }
 ```
 
-* Esp32 no existe una funcion para rotar 90 grados una fotografia capturada por la camara solo existen para poner de cabeza la fotografia que no es una funcion util
+* En el dispositivo Esp32 Cam no existe una funcion para rotar 90 grados una captura de la camara
 
