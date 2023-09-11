@@ -1,5 +1,12 @@
 # Esp32-Cam-Telegram
 
+### Librerias
+<img src="https://github.com/IDiegoUlises/Esp32-Cam-Telegram/blob/main/Imagenes/Universal-TelegramBot-Libreria.png" />
+
+<img src="https://github.com/IDiegoUlises/Esp32-Cam-Telegram/blob/main/Imagenes/ArduinoJson-Libreria.png" />
+
+
+
 ### Codigo que realiza una accion solicitada por el usuario
 
 ```c++
