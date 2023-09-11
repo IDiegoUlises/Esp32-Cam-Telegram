@@ -3,7 +3,11 @@
 ### Librerias
 <img src="https://github.com/IDiegoUlises/Esp32-Cam-Telegram/blob/main/Imagenes/Universal-TelegramBot-Libreria.png" />
 
+* Universal Telegram Bot
+
 <img src="https://github.com/IDiegoUlises/Esp32-Cam-Telegram/blob/main/Imagenes/ArduinoJson-Libreria.png" />
+
+* ArduinoJson se utiliza porque es una libreria de dependencia para utilizar la libreria Telegram Bot
 
 
 
