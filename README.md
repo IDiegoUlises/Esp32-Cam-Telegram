@@ -1,4 +1,4 @@
-# Esp32-Cam-Telegram
+# Esp32 Cam Telegram
 
 ### Librerias
 <img src="https://github.com/IDiegoUlises/Esp32-Cam-Telegram/blob/main/Imagenes/Universal-TelegramBot-Libreria.png" />
