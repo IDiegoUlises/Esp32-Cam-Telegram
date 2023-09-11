@@ -12,8 +12,10 @@
 #define WIFI_SSID "Wifi Home"
 #define WIFI_PASSWORD "S4m4sw3n0s"
 
-//Telegram BOT Token
+//Telegram Bot Token
 String BOTtoken = "6651295482:AAHSOXNTzMyJmrj6nuQi7wskSMFatI8Uyks";
+
+//Identificador del usuario que puede utilizar el bot
 String CHAT_ID  = "6615998413";
 
 //Objeto WifiSecure y UniversalTelegramBot
