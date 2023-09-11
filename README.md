@@ -12,12 +12,10 @@
 ### Crear Bot
 <img src="https://github.com/IDiegoUlises/Esp32-Cam-Telegram/blob/main/Imagenes/IMG-20230911-WA0001.jpg" width="450" height="800" />
 
-### ID
+### ID De Usuario
 <img src="https://github.com/IDiegoUlises/Esp32-Cam-Telegram/blob/main/Imagenes/IMG-20230911-WA0000.jpg" width="450" height="800" />
 
-
-
-### Codigo que realiza una accion solicitada por el usuario
+### Codigo
 
 ```c++
 #include <WiFi.h>
