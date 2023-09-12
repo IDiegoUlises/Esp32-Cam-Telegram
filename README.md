@@ -285,3 +285,6 @@ void loop()
 
 * En el dispositivo Esp32 Cam no existe una funcion para rotar 90 grados una captura de la camara
 
+### Funcionamiento
+![](https://github.com/IDiegoUlises/Esp32-Cam-Telegram/blob/main/Imagenes/GIF-230911_224137.gif)
+
