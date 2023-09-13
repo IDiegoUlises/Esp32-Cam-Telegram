@@ -28,7 +28,7 @@
 
 // Wifi Credenciales
 #define WIFI_SSID "Wifi Home"
-#define WIFI_PASSWORD "S4m4sw3n0s"
+#define WIFI_PASSWORD "123456789"
 
 //Telegram Bot Token
 String BOTtoken = "6651295482:AAHSOXNTzMyJmrj6nuQi7wskSMFatI8Uyks";
